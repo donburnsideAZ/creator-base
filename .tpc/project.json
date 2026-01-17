@@ -1,0 +1,13 @@
+{
+  "name": "creator_base",
+  "main_file": "main.py",
+  "description": "Imported from creator_base",
+  "python_version": "3.12",
+  "created": "2026-01-17T09:15:54.225116",
+  "github_repo": "https://github.com/donburnsideAZ/creator-base.git",
+  "icon_path": null,
+  "snapshot_limit": 10,
+  "ignore_patterns": [],
+  "project_type": "folder",
+  "launch_command": null
+}
