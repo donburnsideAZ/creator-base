@@ -175,6 +175,7 @@ elseif ($hero_type === 'carousel') :
 
 elseif ($hero_type === 'widgets') :
     // Widgets hero mode - only show if at least one widget area has content
+    // Layout: Left side for featured images/media, Right side for text/signup content
     if (is_active_sidebar('hero-left') || is_active_sidebar('hero-right')) :
 ?>
 <section class="hero-section hero-section--widgets">

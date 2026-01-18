@@ -189,6 +189,21 @@ function creator_base_customize_register($wp_customize) {
         'priority'    => 23,
     )));
 
+    // Footer Background Color
+    $wp_customize->add_setting('creator_base_footer_bg_color', array(
+        'default'           => '#000000',
+        'sanitize_callback' => 'sanitize_hex_color',
+        'transport'         => 'refresh',
+    ));
+
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'creator_base_footer_bg_color', array(
+        'label'       => __('Footer Background', 'creator-base'),
+        'description' => __('Background color for the site footer.', 'creator-base'),
+        'section'     => 'creator_base_colors',
+        'settings'    => 'creator_base_footer_bg_color',
+        'priority'    => 24,
+    )));
+
     // Remove WordPress background color control to avoid confusion
     $wp_customize->remove_control('background_color');
 
@@ -745,6 +760,14 @@ function creator_base_customizer_css() {
         }
         .header-social a:hover {
             color: var(--cb-color-accent) !important;
+        }
+        <?php 
+        // Footer background color
+        $footer_bg_color = get_theme_mod('creator_base_footer_bg_color', '#000000');
+        ?>
+        .site-footer {
+            --cb-color-footer-bg: <?php echo esc_attr($footer_bg_color); ?>;
+            background-color: <?php echo esc_attr($footer_bg_color); ?>;
         }
     </style>
     <?php

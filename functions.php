@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CREATOR_BASE_VERSION', '3.0.3');
+define('CREATOR_BASE_VERSION', '3.0.4');
 define('CREATOR_BASE_DIR', get_template_directory());
 define('CREATOR_BASE_URI', get_template_directory_uri());
 
@@ -127,9 +127,9 @@ function creator_base_widgets_init() {
 
     // Hero Left (Featured) - for Widgets hero mode
     register_sidebar(array(
-        'name'          => esc_html__('Hero Left (Featured)', 'creator-base'),
+        'name'          => esc_html__('Hero Left (Image/Media)', 'creator-base'),
         'id'            => 'hero-left',
-        'description'   => esc_html__('Left side of the hero area when Hero Mode is set to Widgets. Great for featured content, videos, or images.', 'creator-base'),
+        'description'   => esc_html__('Left side of the hero area when Hero Mode is set to Widgets. Best for images, videos, or featured media. Takes up most of the width.', 'creator-base'),
         'before_widget' => '<div id="%1$s" class="widget %2$s">',
         'after_widget'  => '</div>',
         'before_title'  => '<h3 class="widget-title">',
@@ -138,9 +138,9 @@ function creator_base_widgets_init() {
 
     // Hero Right (Signup) - for Widgets hero mode
     register_sidebar(array(
-        'name'          => esc_html__('Hero Right (Signup)', 'creator-base'),
+        'name'          => esc_html__('Hero Right (Text/Promo)', 'creator-base'),
         'id'            => 'hero-right',
-        'description'   => esc_html__('Right side of the hero area when Hero Mode is set to Widgets. Perfect for email signup forms, RSS links, or featured blog posts.', 'creator-base'),
+        'description'   => esc_html__('Right side of the hero area when Hero Mode is set to Widgets. Perfect for text widgets, email signup forms, or promotional content. Fixed 350px width.', 'creator-base'),
         'before_widget' => '<div id="%1$s" class="widget %2$s">',
         'after_widget'  => '</div>',
         'before_title'  => '<h3 class="widget-title">',
@@ -1148,4 +1148,168 @@ function creator_base_child_pages_styles() {
     <?php
 }
 add_action( 'wp_head', 'creator_base_child_pages_styles' );
+
+/**
+ * GitHub Theme Updater
+ * 
+ * Checks GitHub releases for updates and integrates with WordPress update system.
+ * No plugin required.
+ */
+class Creator_Base_GitHub_Updater {
+    
+    private $slug = 'creator-base';
+    private $github_username = 'donburnside';
+    private $github_repo = 'creator-base';
+    private $current_version;
+    private $github_response;
+    
+    public function __construct() {
+        $this->current_version = CREATOR_BASE_VERSION;
+        
+        add_filter( 'pre_set_site_transient_update_themes', array( $this, 'check_for_update' ) );
+        add_filter( 'themes_api', array( $this, 'theme_info' ), 20, 3 );
+        add_filter( 'upgrader_source_selection', array( $this, 'fix_directory_name' ), 10, 4 );
+    }
+    
+    /**
+     * Get release info from GitHub API
+     */
+    private function get_github_release() {
+        if ( ! empty( $this->github_response ) ) {
+            return $this->github_response;
+        }
+        
+        $url = sprintf(
+            'https://api.github.com/repos/%s/%s/releases/latest',
+            $this->github_username,
+            $this->github_repo
+        );
+        
+        $response = wp_remote_get( $url, array(
+            'headers' => array(
+                'Accept' => 'application/vnd.github.v3+json',
+            ),
+            'timeout' => 10,
+        ) );
+        
+        if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+            return false;
+        }
+        
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body );
+        
+        if ( empty( $data ) || ! isset( $data->tag_name ) ) {
+            return false;
+        }
+        
+        $this->github_response = $data;
+        return $data;
+    }
+    
+    /**
+     * Check GitHub for theme updates
+     */
+    public function check_for_update( $transient ) {
+        if ( empty( $transient->checked ) ) {
+            return $transient;
+        }
+        
+        $release = $this->get_github_release();
+        
+        if ( ! $release ) {
+            return $transient;
+        }
+        
+        // Remove 'v' prefix from tag if present (e.g., v3.0.3 -> 3.0.3)
+        $github_version = ltrim( $release->tag_name, 'v' );
+        
+        if ( version_compare( $github_version, $this->current_version, '>' ) ) {
+            // Find the zip asset
+            $download_url = '';
+            
+            if ( ! empty( $release->assets ) ) {
+                foreach ( $release->assets as $asset ) {
+                    if ( strpos( $asset->name, '.zip' ) !== false ) {
+                        $download_url = $asset->browser_download_url;
+                        break;
+                    }
+                }
+            }
+            
+            // Fallback to zipball if no asset found
+            if ( empty( $download_url ) ) {
+                $download_url = $release->zipball_url;
+            }
+            
+            $transient->response[ $this->slug ] = array(
+                'theme'       => $this->slug,
+                'new_version' => $github_version,
+                'url'         => $release->html_url,
+                'package'     => $download_url,
+            );
+        }
+        
+        return $transient;
+    }
+    
+    /**
+     * Provide theme info for the update details popup
+     */
+    public function theme_info( $result, $action, $args ) {
+        if ( $action !== 'theme_information' || $args->slug !== $this->slug ) {
+            return $result;
+        }
+        
+        $release = $this->get_github_release();
+        
+        if ( ! $release ) {
+            return $result;
+        }
+        
+        $github_version = ltrim( $release->tag_name, 'v' );
+        
+        return (object) array(
+            'name'           => 'Creator Base',
+            'slug'           => $this->slug,
+            'version'        => $github_version,
+            'author'         => '<a href="https://donburnside.com">Don Burnside</a>',
+            'homepage'       => 'https://github.com/' . $this->github_username . '/' . $this->github_repo,
+            'sections'       => array(
+                'description' => 'A WordPress theme for Podcasters, YouTubers and content creators. Own your content.',
+                'changelog'   => nl2br( esc_html( $release->body ) ),
+            ),
+            'download_link'  => $release->zipball_url,
+            'requires'       => '5.0',
+            'tested'         => '6.4',
+            'last_updated'   => $release->published_at,
+        );
+    }
+    
+    /**
+     * Fix directory name after extraction
+     * GitHub zipballs extract to username-repo-hash, we need creator-base
+     */
+    public function fix_directory_name( $source, $remote_source, $upgrader, $hook_extra ) {
+        if ( ! isset( $hook_extra['theme'] ) || $hook_extra['theme'] !== $this->slug ) {
+            return $source;
+        }
+        
+        global $wp_filesystem;
+        
+        $corrected_source = trailingslashit( $remote_source ) . $this->slug . '/';
+        
+        if ( $wp_filesystem->move( $source, $corrected_source ) ) {
+            return $corrected_source;
+        }
+        
+        return $source;
+    }
+}
+
+// Initialize the updater
+function creator_base_init_updater() {
+    new Creator_Base_GitHub_Updater();
+}
+add_action( 'admin_init', 'creator_base_init_updater' );
 
