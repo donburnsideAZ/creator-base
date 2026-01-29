@@ -4,7 +4,7 @@ Theme URI: https://github.com/creator-base
 Author: Don Burnside (https://donburnside.com)
 Author URI: https://github.com/creator-base
 Description: A clean, simple theme for content creators, Youtubers, Podcasters and Fireball Tim. Blog-focused with support for video and audio embeds. No plugins required, no custom fields needed. Just write, paste embeds in excerpts, and publish.
-Version: 3.0.5
+Version: 3.1.0
 Tested up to: 6.4
 Requires PHP: 7.4
 License: GNU General Public License v2 or later
@@ -1590,14 +1590,18 @@ hr {
     padding: var(--cb-spacing-3xl) var(--cb-spacing-lg) var(--cb-spacing-lg);
 }
 
-.footer-inner {
+/* Footer Widgets Area (Two Columns) */
+.footer-widgets {
     max-width: var(--cb-max-width);
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: var(--cb-spacing-3xl);
-    padding-bottom: var(--cb-spacing-3xl);
+    padding-bottom: var(--cb-spacing-xl);
     border-bottom: 1px solid var(--cb-color-footer-border);
+}
+
+.footer-widgets-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cb-spacing-3xl);
 }
 
 .footer-widget {
@@ -1619,11 +1623,20 @@ hr {
     color: var(--cb-color-footer-text);
     margin: 0;
     line-height: 1.6;
-    max-width: 300px;
 }
 
+.footer-widget .widget {
+    margin-bottom: var(--cb-spacing-md);
+}
+
+.footer-widget .widget:last-child {
+    margin-bottom: 0;
+}
+
+/* Footer Social Icons */
 .footer-social {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--cb-spacing-sm);
     margin-top: var(--cb-spacing-sm);
 }
@@ -1650,19 +1663,11 @@ hr {
     fill: currentColor;
 }
 
-.footer-menu {
-    display: flex;
-    flex-direction: column;
-    gap: var(--cb-spacing-sm);
-}
-
-.footer-menu-title {
-    font-size: var(--cb-font-size-sm);
-    font-weight: var(--cb-font-weight-semibold);
-    margin: 0 0 var(--cb-spacing-sm) 0;
-    color: #ffffff;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+/* Footer Menu (Full Width Horizontal) */
+.footer-menu-wrap {
+    max-width: var(--cb-max-width);
+    margin: 0 auto;
+    padding: var(--cb-spacing-lg) 0;
 }
 
 .footer-menu ul {
@@ -1670,25 +1675,153 @@ hr {
     margin: 0;
     padding: 0;
     display: flex;
-    flex-direction: column;
-    gap: var(--cb-spacing-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--cb-spacing-md) var(--cb-spacing-xl);
 }
 
 .footer-menu a {
     color: var(--cb-color-footer-text);
     font-size: var(--cb-font-size-sm);
+    transition: color var(--cb-transition);
 }
 
 .footer-menu a:hover {
     color: #ffffff;
 }
 
+/* Footer Copyright */
 .footer-copyright {
     max-width: var(--cb-max-width);
     margin: var(--cb-spacing-lg) auto 0;
     font-size: var(--cb-font-size-xs);
     color: var(--cb-color-text-muted);
     text-align: center;
+}
+
+/* ==========================================================================
+   Links Page Template
+   ========================================================================== */
+
+.links-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cb-spacing-xl) var(--cb-spacing-lg);
+}
+
+.links-page-inner {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cb-spacing-lg);
+}
+
+.links-page-logo {
+    margin-bottom: var(--cb-spacing-sm);
+}
+
+.links-page-logo img {
+    max-width: 200px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+}
+
+.links-page-title {
+    font-size: var(--cb-font-size-2xl);
+    font-weight: var(--cb-font-weight-bold);
+    color: var(--cb-color-text-primary);
+    margin: 0;
+    text-align: center;
+}
+
+.links-page-description {
+    font-size: var(--cb-font-size-base);
+    color: var(--cb-color-text-secondary);
+    text-align: center;
+    max-width: 360px;
+}
+
+.links-page-description p {
+    margin: 0;
+}
+
+.links-page-menu {
+    width: 100%;
+}
+
+.links-page-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cb-spacing-md);
+}
+
+.links-page-menu li {
+    width: 100%;
+}
+
+.links-page-menu a {
+    display: block;
+    width: 100%;
+    padding: var(--cb-spacing-md) var(--cb-spacing-lg);
+    background-color: var(--cb-color-bg-secondary);
+    border: 2px solid var(--cb-color-border);
+    border-radius: var(--cb-radius-lg);
+    color: var(--cb-color-text-primary);
+    font-size: var(--cb-font-size-base);
+    font-weight: var(--cb-font-weight-medium);
+    text-align: center;
+    text-decoration: none;
+    transition: all var(--cb-transition);
+}
+
+.links-page-menu a:hover {
+    background-color: var(--cb-color-accent);
+    border-color: var(--cb-color-accent);
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.links-page-notice {
+    font-size: var(--cb-font-size-sm);
+    color: var(--cb-color-text-muted);
+    text-align: center;
+    font-style: italic;
+}
+
+.links-page-widgets {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cb-spacing-md);
+    margin-top: var(--cb-spacing-md);
+}
+
+.links-page-widgets .widget {
+    margin-bottom: 0;
+}
+
+/* Social icons in Links Page widget area */
+.links-page-widgets .footer-social {
+    justify-content: center;
+    margin-top: 0;
+}
+
+/* Social icons section on Links page */
+.links-page-social {
+    margin-top: var(--cb-spacing-md);
+}
+
+.links-page-social .footer-social {
+    justify-content: center;
 }
 
 /* ==========================================================================
@@ -2016,9 +2149,15 @@ hr {
         gap: var(--cb-spacing-lg);
     }
     
-    .footer-inner {
+    .footer-widgets-inner {
         grid-template-columns: 1fr;
         gap: var(--cb-spacing-xl);
+    }
+    
+    .footer-menu ul {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--cb-spacing-sm);
     }
     
     .page-content.has-sidebar {

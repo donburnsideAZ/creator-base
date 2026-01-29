@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CREATOR_BASE_VERSION', '3.0.5');
+define('CREATOR_BASE_VERSION', '3.1.0');
 define('CREATOR_BASE_DIR', get_template_directory());
 define('CREATOR_BASE_URI', get_template_directory_uri());
 
@@ -33,8 +33,10 @@ function creator_base_setup() {
     register_nav_menus(array(
         'primary'        => esc_html__('Primary Menu', 'creator-base'),
         'featured-links' => esc_html__('Featured Links', 'creator-base'),
-        'footer-1'       => esc_html__('Footer Menu 1', 'creator-base'),
-        'footer-2'       => esc_html__('Footer Menu 2', 'creator-base'),
+        'footer'         => esc_html__('Footer Menu', 'creator-base'),
+        'footer-1'       => esc_html__('Footer Menu 1 (Legacy)', 'creator-base'),
+        'footer-2'       => esc_html__('Footer Menu 2 (Legacy)', 'creator-base'),
+        'links-page'     => esc_html__('Links Page Menu', 'creator-base'),
     ));
 
     // Switch default core markup to valid HTML5
@@ -147,11 +149,44 @@ function creator_base_widgets_init() {
         'after_title'   => '</h3>',
     ));
 
-    // Footer Widget
+    // Footer Left Widget
     register_sidebar(array(
-        'name'          => esc_html__('Footer Widget', 'creator-base'),
+        'name'          => esc_html__('Footer Left', 'creator-base'),
+        'id'            => 'footer-left',
+        'description'   => esc_html__('Left column of the footer. Great for about text or logo.', 'creator-base'),
+        'before_widget' => '<div id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h4 class="widget-title">',
+        'after_title'   => '</h4>',
+    ));
+
+    // Footer Right Widget
+    register_sidebar(array(
+        'name'          => esc_html__('Footer Right', 'creator-base'),
+        'id'            => 'footer-right',
+        'description'   => esc_html__('Right column of the footer. Great for newsletter signup or contact info.', 'creator-base'),
+        'before_widget' => '<div id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h4 class="widget-title">',
+        'after_title'   => '</h4>',
+    ));
+
+    // Legacy Footer Widget (for backwards compatibility)
+    register_sidebar(array(
+        'name'          => esc_html__('Footer Widget (Legacy)', 'creator-base'),
         'id'            => 'footer-widget',
-        'description'   => esc_html__('Widget area in the left column of the footer.', 'creator-base'),
+        'description'   => esc_html__('Legacy widget area. Move widgets to Footer Left or Footer Right.', 'creator-base'),
+        'before_widget' => '<div id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</div>',
+        'before_title'  => '<h4 class="widget-title">',
+        'after_title'   => '</h4>',
+    ));
+
+    // Links Page Widget
+    register_sidebar(array(
+        'name'          => esc_html__('Links Page', 'creator-base'),
+        'id'            => 'links-page',
+        'description'   => esc_html__('Widget area for the Links page template. Add social icons or additional content below the menu.', 'creator-base'),
         'before_widget' => '<div id="%1$s" class="widget %2$s">',
         'after_widget'  => '</div>',
         'before_title'  => '<h4 class="widget-title">',

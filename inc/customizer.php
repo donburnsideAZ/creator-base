@@ -421,6 +421,26 @@ function creator_base_customize_register($wp_customize) {
         'priority' => 25,
     ));
 
+    // Homepage Rows
+    $wp_customize->add_setting('creator_base_homepage_rows', array(
+        'default'           => 3,
+        'sanitize_callback' => 'creator_base_sanitize_homepage_rows',
+    ));
+
+    $wp_customize->add_control('creator_base_homepage_rows', array(
+        'label'       => __('Homepage Rows', 'creator-base'),
+        'description' => __('Number of rows to display on the homepage (3 posts per row).', 'creator-base'),
+        'section'     => 'creator_base_layout',
+        'type'        => 'select',
+        'choices'     => array(
+            1 => __('1 row (3 posts)', 'creator-base'),
+            2 => __('2 rows (6 posts)', 'creator-base'),
+            3 => __('3 rows (9 posts)', 'creator-base'),
+            4 => __('4 rows (12 posts)', 'creator-base'),
+            5 => __('5 rows (15 posts)', 'creator-base'),
+        ),
+    ));
+
     // Page Sidebar Toggle
     $wp_customize->add_setting('creator_base_page_sidebar', array(
         'default'           => false,
@@ -646,6 +666,14 @@ function creator_base_sanitize_header_social_color($value) {
 function creator_base_sanitize_hero_display($value) {
     $valid = array('homepage', 'homepage_posts');
     return in_array($value, $valid) ? $value : 'homepage';
+}
+
+/**
+ * Sanitize homepage rows
+ */
+function creator_base_sanitize_homepage_rows($value) {
+    $value = absint($value);
+    return ($value >= 1 && $value <= 5) ? $value : 3;
 }
 
 /**

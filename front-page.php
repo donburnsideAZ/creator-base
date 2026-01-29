@@ -36,6 +36,10 @@ $has_promo_sidebar = creator_base_show_promo_bar() && $promo_layout === 'sidebar
             $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
             $exclude = $hero_post_id ? array($hero_post_id) : array();
             
+            // Get homepage rows setting (1-5 rows, 3 posts per row)
+            $homepage_rows = get_theme_mod('creator_base_homepage_rows', 3);
+            $posts_per_page = $homepage_rows * 3;
+            
             // Exclude Portfolio category (and its children) from homepage
             $portfolio_cat = get_category_by_slug('portfolio');
             $exclude_cats = array();
@@ -52,7 +56,7 @@ $has_promo_sidebar = creator_base_show_promo_bar() && $promo_layout === 'sidebar
             }
             
             $cards_query = new WP_Query(array(
-                'posts_per_page'   => 9,
+                'posts_per_page'   => $posts_per_page,
                 'paged'            => $paged,
                 'post__not_in'     => $exclude,
                 'category__not_in' => $exclude_cats,

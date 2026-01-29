@@ -9,58 +9,65 @@
     </div><!-- #content -->
 
     <footer id="colophon" class="site-footer">
-        <div class="footer-inner">
-            
-            <!-- Footer Widget Area (Left) -->
-            <div class="footer-widget">
-                <?php if (is_active_sidebar('footer-widget')) : ?>
-                    <?php dynamic_sidebar('footer-widget'); ?>
-                <?php else : ?>
-                    <h4 class="footer-title">
-                        <?php 
-                        $footer_title = get_theme_mod('creator_base_footer_title', '');
-                        echo esc_html($footer_title ? $footer_title : get_bloginfo('name')); 
-                        ?>
-                    </h4>
-                    <?php 
-                    $footer_desc = get_theme_mod('creator_base_footer_description', '');
-                    if ($footer_desc) : ?>
-                        <p><?php echo esc_html($footer_desc); ?></p>
-                    <?php endif; ?>
-                <?php endif; ?>
+        
+        <?php if (is_active_sidebar('footer-left') || is_active_sidebar('footer-right') || is_active_sidebar('footer-widget')) : ?>
+        <div class="footer-widgets">
+            <div class="footer-widgets-inner">
                 
-                <?php creator_base_social_links(); ?>
+                <!-- Footer Left Widget Area -->
+                <div class="footer-widget footer-left">
+                    <?php if (is_active_sidebar('footer-left')) : ?>
+                        <?php dynamic_sidebar('footer-left'); ?>
+                    <?php elseif (is_active_sidebar('footer-widget')) : ?>
+                        <?php // Legacy support: render old footer-widget here ?>
+                        <?php dynamic_sidebar('footer-widget'); ?>
+                    <?php endif; ?>
+                    <?php creator_base_social_links(); ?>
+                </div>
+                
+                <!-- Footer Right Widget Area -->
+                <div class="footer-widget footer-right">
+                    <?php if (is_active_sidebar('footer-right')) : ?>
+                        <?php dynamic_sidebar('footer-right'); ?>
+                    <?php endif; ?>
+                </div>
+                
             </div>
-            
-            <!-- Footer Menu 1 -->
-            <div class="footer-menu">
-                <?php if (has_nav_menu('footer-1')) : ?>
-                    <h4 class="footer-menu-title"><?php esc_html_e('Navigate', 'creator-base'); ?></h4>
-                    <?php
-                    wp_nav_menu(array(
-                        'theme_location' => 'footer-1',
-                        'container'      => false,
-                        'depth'          => 1,
-                    ));
-                    ?>
-                <?php endif; ?>
-            </div>
-            
-            <!-- Footer Menu 2 -->
-            <div class="footer-menu">
-                <?php if (has_nav_menu('footer-2')) : ?>
-                    <h4 class="footer-menu-title"><?php esc_html_e('Legal', 'creator-base'); ?></h4>
-                    <?php
-                    wp_nav_menu(array(
-                        'theme_location' => 'footer-2',
-                        'container'      => false,
-                        'depth'          => 1,
-                    ));
-                    ?>
-                <?php endif; ?>
-            </div>
-            
         </div>
+        <?php endif; ?>
+        
+        <?php if (has_nav_menu('footer') || has_nav_menu('footer-1') || has_nav_menu('footer-2')) : ?>
+        <div class="footer-menu-wrap">
+            <nav class="footer-menu" aria-label="<?php esc_attr_e('Footer Menu', 'creator-base'); ?>">
+                <?php
+                if (has_nav_menu('footer')) {
+                    // New single footer menu
+                    wp_nav_menu(array(
+                        'theme_location' => 'footer',
+                        'container'      => false,
+                        'depth'          => 1,
+                    ));
+                } else {
+                    // Legacy: combine footer-1 and footer-2 menus
+                    if (has_nav_menu('footer-1')) {
+                        wp_nav_menu(array(
+                            'theme_location' => 'footer-1',
+                            'container'      => false,
+                            'depth'          => 1,
+                        ));
+                    }
+                    if (has_nav_menu('footer-2')) {
+                        wp_nav_menu(array(
+                            'theme_location' => 'footer-2',
+                            'container'      => false,
+                            'depth'          => 1,
+                        ));
+                    }
+                }
+                ?>
+            </nav>
+        </div>
+        <?php endif; ?>
         
         <div class="footer-copyright">
             <?php echo creator_base_copyright(); ?>
