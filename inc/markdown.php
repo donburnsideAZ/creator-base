@@ -134,16 +134,81 @@ class Creator_Base_Markdown {
 }
 
 /**
+ * Check if content has complex Gutenberg blocks that shouldn't be markdown-processed
+ * 
+ * Simple paragraph/heading wrappers are fine - we strip those and process markdown.
+ * But complex blocks (galleries, columns, embeds, etc.) should be left alone.
+ *
+ * @param string $content Post content
+ * @return bool True if content has complex blocks that should skip markdown
+ */
+function creator_base_has_complex_blocks($content) {
+    // No block markers at all? Safe to process
+    if (strpos($content, '<!-- wp:') === false) {
+        return false;
+    }
+    
+    // These simple blocks are safe - we can strip them and process markdown
+    $simple_blocks = array(
+        'wp:paragraph',
+        'wp:heading',
+        'wp:list',
+        'wp:list-item',
+        'wp:quote',
+        'wp:code',
+        'wp:preformatted',
+        'wp:separator',
+    );
+    
+    // Build pattern to find any block that's NOT in our simple list
+    // Match <!-- wp:blockname where blockname is not in simple_blocks
+    preg_match_all('/<!-- wp:([a-z0-9-]+\/)?([a-z0-9-]+)/', $content, $matches);
+    
+    if (empty($matches[2])) {
+        return false;
+    }
+    
+    foreach ($matches[2] as $block_name) {
+        $full_block = 'wp:' . $block_name;
+        if (!in_array($full_block, $simple_blocks)) {
+            // Found a complex block - don't process markdown
+            return true;
+        }
+    }
+    
+    // Only simple blocks found - safe to process
+    return false;
+}
+
+/**
+ * Strip simple Gutenberg block wrappers from content
+ * 
+ * Removes <!-- wp:paragraph --> and similar markers so markdown can process cleanly
+ *
+ * @param string $content Post content
+ * @return string Content with block wrappers removed
+ */
+function creator_base_strip_block_wrappers($content) {
+    // Remove block comments <!-- wp:anything --> and <!-- /wp:anything -->
+    $content = preg_replace('/<!-- \/?wp:[^>]+ -->\s*/', '', $content);
+    
+    return trim($content);
+}
+
+/**
  * Apply markdown to post content
  */
 function creator_base_markdown_content($content) {
-    // Only process if not already processed by block editor
-    if (has_blocks($content)) {
+    // Skip if content has complex blocks (galleries, columns, embeds, etc.)
+    if (creator_base_has_complex_blocks($content)) {
         return $content;
     }
     
-    // Skip markdown processing if content already contains HTML links
-    // This prevents the underscore-to-italic regex from mangling URLs with query params like ?_pos=3&_sid=xxx
+    // Strip any simple block wrappers (paragraph, heading, etc.)
+    $content = creator_base_strip_block_wrappers($content);
+    
+    // Skip if content already contains HTML links
+    // Prevents underscore-to-italic regex from mangling URLs with query params
     if (preg_match('/<a\s+[^>]*href\s*=/i', $content)) {
         return $content;
     }
@@ -161,11 +226,13 @@ function creator_base_markdown_excerpt($excerpt) {
         return $excerpt;
     }
     
-    // Skip markdown processing if excerpt already contains HTML links
-    // This prevents the underscore-to-italic regex from mangling URLs with query params like ?_pos=3&_sid=xxx
+    // Skip if excerpt already contains HTML links
     if (preg_match('/<a\s+[^>]*href\s*=/i', $excerpt)) {
         return $excerpt;
     }
+    
+    // Strip any block wrappers that might have snuck in
+    $excerpt = creator_base_strip_block_wrappers($excerpt);
     
     return Creator_Base_Markdown::parse($excerpt);
 }
