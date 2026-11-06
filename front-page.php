@@ -33,7 +33,11 @@ $has_promo_sidebar = creator_base_show_promo_bar() && $promo_layout === 'sidebar
         <div class="cards-grid">
             <?php
             // Get posts excluding the hero post and Portfolio category
+            // Use 'page' for static front page, 'paged' for blog homepage
             $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+            if (is_front_page()) {
+                $paged = (get_query_var('page')) ? get_query_var('page') : $paged;
+            }
             $exclude = $hero_post_id ? array($hero_post_id) : array();
             
             // Get homepage rows setting (1-5 rows, 3 posts per row)

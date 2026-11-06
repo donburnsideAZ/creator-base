@@ -71,7 +71,7 @@
         
         if ($hero_type !== 'video' && $card_excerpt && !$is_just_url) :
         ?>
-        <p class="card-excerpt"><?php echo esc_html(wp_trim_words($card_excerpt, 20, '...')); ?></p>
+        <p class="card-excerpt"><?php echo esc_html(wp_trim_words(Creator_Base_Markdown::to_text($card_excerpt), 20, '...')); ?></p>
         <?php endif; ?>
         
         <?php 

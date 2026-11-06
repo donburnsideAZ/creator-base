@@ -3,14 +3,14 @@
  * Creator Base Theme Functions
  *
  * @package Creator_Base
- * @version 2.0.0
+ * @version 3.2.0
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-define('CREATOR_BASE_VERSION', '3.1.0');
+define('CREATOR_BASE_VERSION', '3.2.0');
 define('CREATOR_BASE_DIR', get_template_directory());
 define('CREATOR_BASE_URI', get_template_directory_uri());
 
@@ -293,7 +293,7 @@ class Creator_Base_Featured_Post_Widget extends WP_Widget {
                     $is_just_url = preg_match('/^\s*https?:\/\/\S+\s*$/', $text_excerpt);
                     if ($text_excerpt && !$is_just_url) :
                 ?>
-                    <p class="featured-post-excerpt"><?php echo esc_html(wp_trim_words($text_excerpt, 25, '...')); ?></p>
+                    <p class="featured-post-excerpt"><?php echo esc_html(wp_trim_words(Creator_Base_Markdown::to_text($text_excerpt), 25, '...')); ?></p>
                 <?php 
                     endif;
                 endif; ?>
@@ -480,6 +480,11 @@ function creator_base_get_excerpt_with_embeds($post = null) {
             $excerpt = $wp_embed->autoembed($excerpt);
             $excerpt = $wp_embed->run_shortcode($excerpt);
         }
+    }
+    
+    // No embed found: render inline Markdown so [links](url) and **bold** work
+    if (stripos($excerpt, '<iframe') === false) {
+        $excerpt = Creator_Base_Markdown::inline($excerpt);
     }
     
     // Sanitize while preserving embed HTML
@@ -1193,7 +1198,7 @@ add_action( 'wp_head', 'creator_base_child_pages_styles' );
 class Creator_Base_GitHub_Updater {
     
     private $slug = 'creator-base';
-    private $github_username = 'donburnside';
+    private $github_username = 'donburnsideAZ';
     private $github_repo = 'creator-base';
     private $current_version;
     private $github_response;

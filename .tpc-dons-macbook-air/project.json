@@ -1,14 +1,15 @@
 {
-  "name": "creator_base",
+  "name": "Creator Base",
   "main_file": "main.py",
-  "description": "Imported from creator_base",
+  "description": "Imported from creator-base",
+  "version": "1.0.0",
   "python_version": "3.12",
-  "created": "2026-01-17T09:15:54.225116",
+  "created": "2026-11-06T08:06:14.543183",
   "github_repo": "https://github.com/donburnsideAZ/creator-base.git",
   "icon_path": null,
+  "entitlements_path": null,
   "snapshot_limit": 10,
   "ignore_patterns": [],
   "project_type": "folder",
-  "launch_command": null,
-  "last_backup": "2026-01-29T11:22:13.013670"
+  "launch_command": null
 }
